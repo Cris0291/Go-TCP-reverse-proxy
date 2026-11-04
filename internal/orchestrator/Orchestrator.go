@@ -3,6 +3,8 @@ package orchestrator
 import (
 	"fmt"
 	"net"
+
+	tunnel "github.com/Cris0291/myproxy/internal/tunnel"
 )
 
 type ConnectionType int
@@ -45,21 +47,28 @@ func (orchestrator *Orchestrator) HandleHalfClose(connection net.Conn, connDir C
 	}
 }
 
-func (orchestrator *Orchestrator) Connet() error {
-	var client net.Conn
-	var server net.Conn
+func (orchestrator *Orchestrator) Connet(serverAddress string) error {
+	var clientConn net.Conn
 
 	listener, err := net.Listen("tcp", orchestrator.proxyPort)
 	if err != nil {
 		return fmt.Errorf("client connection could not be established: %w", err)
 	}
 
-	for {
-		clientConn, err := listener.Accept()
-		if err != nil {
-			return fmt.Errorf("connection could not be accepted: %w", err)
-		}
+	clientConn, err = listener.Accept()
+	if err != nil {
+		return fmt.Errorf("connection could not be accepted: %w", err)
 	}
 
-	net.Dial("tcp", address string)
+	serverConn, err := net.Dial("tcp", serverAddress)
+	if err != nil {
+		return fmt.Errorf("server connection could not be established: %w", err)
+	}
+
+	tunnel.ConnectionHandler(clientConn, serverConn)
+
+	pair := PairConn{clientConn, serverConn}
+	orchestrator.connections = append(orchestrator.connections, pair)
+
+	return nil
 }

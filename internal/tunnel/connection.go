@@ -12,15 +12,12 @@ const (
 	ServerConnection ConnectionType = 1
 )
 
-func ConnectionHandler(client net.Conn, server net.Conn, connDirection ConnectionType) <-chan byte {
-	dataStream := make(chan byte)
+func ConnectionHandler(client net.Conn, server net.Conn) {
 	go func() {
-		if connDirection == ClientConnection {
-			io.Copy(server, client)
-		} else {
-			io.Copy(client, server)
-		}
+		io.Copy(server, client)
 	}()
 
-	return dataStream
+	go func() {
+		io.Copy(client, server)
+	}()
 }
