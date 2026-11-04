@@ -1,7 +1,7 @@
 package orchestrator
 
 import (
-	orchestrator "_/home/cris0291/GoProjects/TCP_reverse_proxy/internal/Orchestrator"
+	"fmt"
 	"net"
 )
 
@@ -27,6 +27,7 @@ type PairConn struct {
 type Orchestrator struct {
 	connections []PairConn
 	proxyIp     string
+	proxyPort   string
 }
 
 func (orchestrator *Orchestrator) HandleHalfClose(connection net.Conn, connDir ConnectionDirection) {
@@ -44,5 +45,21 @@ func (orchestrator *Orchestrator) HandleHalfClose(connection net.Conn, connDir C
 	}
 }
 
-func (orchestrator *Orchestrator) ConnectClient() {
+func (orchestrator *Orchestrator) Connet() error {
+	var client net.Conn
+	var server net.Conn
+
+	listener, err := net.Listen("tcp", orchestrator.proxyPort)
+	if err != nil {
+		return fmt.Errorf("client connection could not be established: %w", err)
+	}
+
+	for {
+		clientConn, err := listener.Accept()
+		if err != nil {
+			return fmt.Errorf("connection could not be accepted: %w", err)
+		}
+	}
+
+	net.Dial("tcp", address string)
 }

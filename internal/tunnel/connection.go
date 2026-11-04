@@ -12,7 +12,7 @@ const (
 	ServerConnection ConnectionType = 1
 )
 
-func connectionHandler(client net.Conn, server net.Conn, connDirection ConnectionType) <-chan byte {
+func ConnectionHandler(client net.Conn, server net.Conn, connDirection ConnectionType) <-chan byte {
 	dataStream := make(chan byte)
 	go func() {
 		if connDirection == ClientConnection {
