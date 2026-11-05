@@ -2,8 +2,7 @@ package orchestrator
 
 import (
 	"fmt"
-	"net"
-
+	"net"	
 	tunnel "github.com/Cris0291/myproxy/internal/tunnel"
 )
 
@@ -65,10 +64,12 @@ func (orchestrator *Orchestrator) Connet(serverAddress string) error {
 		return fmt.Errorf("server connection could not be established: %w", err)
 	}
 
-	tunnel.ConnectionHandler(clientConn, serverConn)
+	go tunnel.ConnectionHandler(clientConn, serverConn)
 
 	pair := PairConn{clientConn, serverConn}
 	orchestrator.connections = append(orchestrator.connections, pair)
 
 	return nil
 }
+
+func (orchestrator *Orchestrator) 
