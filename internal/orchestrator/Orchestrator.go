@@ -31,7 +31,7 @@ type Orchestrator struct {
 	proxyPort   string
 }
 
-func (orchestrator *Orchestrator) HandleHalfClose(connection net.Conn, connDir ConnectionDirection) {
+func (orchestrator *Orchestrator) Close(connection net.Conn, connDir ConnectionDirection) {
 	// for now i am going to handle the case in which the net.Conn interface
 	// is implemented by net.TcpConn
 	tcpConn, ok := connection.(*net.TCPConn)
@@ -72,4 +72,4 @@ func (orchestrator *Orchestrator) Connet(serverAddress string) error {
 	return nil
 }
 
-func (orchestrator *Orchestrator) 
+func (orchestrator *Orchestrator) A 

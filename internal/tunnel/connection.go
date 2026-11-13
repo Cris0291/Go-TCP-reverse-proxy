@@ -21,7 +21,7 @@ func ConnectionHandler(client net.Conn, server net.Conn) {
 		defer wg.Done()
 
 		io.Copy(server, client)
-		tcpConn, ok := client.(*net.TCPConn)
+		tcpConn, ok := server.(*net.TCPConn)
 
 		if ok {
 			tcpConn.CloseWrite()
@@ -32,7 +32,7 @@ func ConnectionHandler(client net.Conn, server net.Conn) {
 		defer wg.Done()
 
 		io.Copy(client, server)
-		tcpConn, ok := server.(*net.TCPConn)
+		tcpConn, ok := client.(*net.TCPConn)
 
 		if ok {
 			tcpConn.CloseWrite()
