@@ -38,4 +38,6 @@ func ConnectionHandler(client net.Conn, server net.Conn) {
 			tcpConn.CloseWrite()
 		}
 	}()
+
+	wg.Wait()
 }
