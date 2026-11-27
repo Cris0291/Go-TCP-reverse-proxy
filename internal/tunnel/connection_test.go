@@ -1,6 +1,7 @@
 package tunnel_test
 
 import (
+	"io"
 	"net"
 	"testing"
 
@@ -8,6 +9,9 @@ import (
 )
 
 func TestConnectionHandler(t *testing.T) {
+	// Arrange
+	test := "Hello World"
+
 	test_client, proxy_server, err := createConnectionPair()
 	if err != nil {
 		t.Fatalf("client-proxy connection could not be established returned an error: %v", err)
@@ -18,24 +22,54 @@ func TestConnectionHandler(t *testing.T) {
 		t.Fatalf("proxy-server connection could not be established returned an error: %v", err)
 	}
 
-	test_client.Write()
+	// Act
+	test_client.Write([]byte(test))
+
+	go func() {
+		buf := make([]byte, 15)
+
+		_, err := io.ReadAll(test_server)
+		if err != nil {
+			t.Errorf("test server could not read message returned an error: %v", err)
+			return
+		}
+
+		for total := 0; total < len(buf); {
+			n, err := test_server.Write(buf)
+			total += n
+
+			if err != nil {
+				t.Errorf("test server could not read message returned an error: %v", err)
+				return
+			}
+		}
+	}()
 
 	done, errCh1, errCh2 := tunnel.ConnectionHandler(proxy_client, proxy_server)
 
+	data, err := io.ReadAll(test_client)
+	if err != nil {
+		t.Fatalf("client read returned an error: %v", err)
+	}
+	res := string(data)
+
+	// Assert
 	for {
 		select {
 		case err := <-errCh1:
-			// TODO do soemthing
+			t.Fatalf("proxy server-client returned an error: %v", err)
 		case err := <-errCh2:
-			// TODO do something
+			t.Fatalf("proxy client-server returned an error: %v", err)
 		case <-done:
 			select {
 			case err := <-errCh1:
-				// TODO
+				t.Fatalf("proxy server-client after done returned an error: %v", err)
 			case err := <-errCh2:
-				// TODO
+				t.Fatalf("proxy cleint-server after done returned an error: %v", err)
 			default:
-				// TODO
+				if res != test {
+					t.Fatalf("test failed waht client read is not the same that it sent")
+				}
 			}
 		}
 	}
